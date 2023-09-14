@@ -1,0 +1,307 @@
+/*******************************************************************************
+ * CS 103 Twenty-One (Blackjack) Project
+/******************************************************************************/
+
+// Add other #includes if you need
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
+
+/* Prototypes */
+void shuffle(int cards[]);
+void printCard(int id);
+int cardValue(int id);
+void printHand(int hand[], int numCards);
+int getBestScore(int hand[], int numCards);
+
+const int NUM_CARDS = 52;
+
+/**
+ * Global arrays to be used as look-up tables. You 
+ */
+const char suit[4] = {'H','S','D','C'};
+const char* type[13] = 
+  {"2","3","4","5","6","7",
+   "8","9","10","J","Q","K","A"};
+const int value[13] = {2,3,4,5,6,7,8,9,10,10,10,10,11};
+
+/**
+ * Should permute the deck of cards, effectively shuffling it.
+ * You must use the Fisher-Yates / Durstenfeld shuffle algorithm
+ *  described in the assignment writeup.
+ */
+
+void swap(int *a,int *b) { //swap function
+  int temp = *a;
+  *a = *b;
+  *b = temp;
+
+}
+void shuffle(int cards[])
+{
+  /******** You complete ****************/
+  //the fisher yates shuffle
+  for (int i=51; i>0; i--) { // swapping cards in backward order
+    int j = rand()%(i+1); // finds random card j between 1~i to swap with i card
+    swap(&cards[i], &cards[j]); 
+  }
+}
+
+/**
+ * Prints the card in a "pretty" format:   "type-suit"
+ *  Examples:  K-C  (King of clubs), 2-H (2 of hearts)
+ *  Valid Types are: 2,3,4,5,6,7,8,9,10,J,Q,K,A
+ *  Valid Suits are: H, D, C, S
+ *
+ *  Must use the suit and type arrays to lookup
+ *   the appropriate characters to print.
+ */
+void printCard(int id) 
+{
+  /******** You complete ****************/
+  cout << type[id%13] << "-";
+  /* switch (id/13) { //card value 
+    case 0:
+      cout << "2-";
+    case 1:
+      cout << "3-";
+    case 2:
+      cout << "4-";
+    case 3:
+      cout << "5-";
+    case 4:
+      cout << "6-";
+    case 5:
+      cout << "7-";
+    case 6:
+      cout << "8-";
+    case 7:
+      cout << "9-";
+    case 8:
+      cout << "10-";
+    case 9 :
+      cout << "J-";
+    case 10: 
+      cout << "Q-";
+    case 11: 
+      cout << "K-";
+    case 12:
+      cout << "A-";
+  } 
+   switch (id) {
+    case id<13:
+      cout << "H";
+    case id<26:
+      cout <<"S";
+    case id<39:
+      cout <<"D";
+    case id<52
+      cout << "C"; */
+    cout << suit[id/13]; 
+}
+/**
+ * Returns the numeric value of the card.
+ *  Should return 11 for an ACE and can then
+ *  be adjusted externally based on the sum of the score.
+ *
+ * Must use the values array to lookup the appropriate
+ *  card return value.
+ */
+int cardValue(int id)
+{
+  /******** You complete ****************/
+  return value[id%13];
+
+}
+
+/**
+ * Should print out each card in the hand separated by a space and
+ * then print a newline at the end.  
+ * Should use printCard() to print out each card.
+ */
+void printHand(int hand[], int numCards)
+{
+  /******** You complete ****************/
+  for (int i=0; i<numCards; i++) {
+    printCard(hand[i]);
+    cout << " ";
+  }
+
+}
+
+/**
+ * Should return the total score of the provided hand.  
+ * ACES should be treated as 11s to make the highest possible hand
+ *  and only being reduced to 1s as needed to avoid busting.
+ */
+int getBestScore(int hand[], int numCards)
+{
+  /******** You complete ****************/
+  int sum = 0;
+  for (int i=0; i<numCards; i++) {
+    sum += cardValue(hand[i]);
+  }
+  for (int i=0; i<numCards; i++) {
+    if (cardValue(hand[i])==11 && sum>21) {
+      sum -= 10; // check if sum reaches 21 at the end because if ace is pulled out first, then program will count it as 11 no matter the sum>21
+    } 
+  }
+  return sum;
+}
+/**
+ * Main program logic for the game of 21
+ */
+int main(int argc, char* argv[])
+{
+  //---------------------------------------
+  // Do not change this code -- Begin
+  //---------------------------------------
+  if(argc < 2){
+    cout << "Error - Please provide the seed value." << endl;
+    return 1; 
+  }
+  int seed = atoi(argv[1]);
+  srand(seed); // 
+
+  int cards[52];
+  int dhand[9];
+  int phand[9];
+  //---------------------------------------
+  // Do not change this code -- End
+  //---------------------------------------
+
+  /******** You complete ****************/
+bool execute = true;
+bool playerBust = false;
+bool dealerBust = false;
+while (execute == true) {
+  for (int i=0; i<52; i++) {
+      cards[i]=i; }
+
+    shuffle(cards);
+    int phandcount = 0;
+    int dhandcount = 0;
+    int deckcount = 0;
+
+    phand[0] = cards[0]; // dealing first card to player
+    phandcount++;
+    dhand[0] = cards[1];
+    dhandcount++;
+    phand[1] = cards[2];
+    phandcount++;
+    dhand[1] = cards[3];
+    dhandcount++;
+    deckcount = 3;
+    cout << "Dealer: ";
+    cout << "?" << " ";
+    printCard(dhand[1]);
+    cout << endl;
+
+    cout << "Player: ";
+    printHand(phand,2);
+    cout << endl;
+
+    char decision;
+
+
+    while (getBestScore(phand,phandcount)<21) { 
+      cout << "Type 'h' to hit and 's' to stay:" << endl;
+      cin >> decision;
+      if (decision == 'h') {
+        phand[phandcount] = cards[deckcount+1]; //phandcount up to 2 right now
+        cout << "Player: ";
+        printHand(phand, phandcount+1); //~2+1=3 will show index 0,1,2
+        phandcount++;
+        deckcount++;
+        cout << endl;
+          if (getBestScore(phand, phandcount)>21) {
+          cout << "Player " << "busts" << endl;
+          cout << "Lose " << getBestScore(phand,phandcount) <<" " << getBestScore(dhand,dhandcount) << endl;
+          playerBust = true;
+          break; // how to skip dealer's turn and end game here? -> execute false before break
+          }
+      }
+      else if (decision == 's') {
+        break;
+      }
+    } // if (playerBust == true) { break; }
+      if (getBestScore(phand,phandcount)==21) {
+        dealerBust = true;
+        while (getBestScore(dhand,dhandcount)<17) {
+          dhand[dhandcount] = cards[deckcount+1];
+          dhandcount++;
+          deckcount++;
+        }
+        cout <<"Dealer: ";
+        printHand(dhand, dhandcount);
+        cout << endl; 
+        cout << "Win " << getBestScore(phand,phandcount) << " " << getBestScore(dhand,dhandcount) << endl;
+        // break;
+      }
+    while (getBestScore(dhand,dhandcount)<21 && playerBust == false && getBestScore(phand,phandcount)!=21 ) { 
+      if (getBestScore(dhand,dhandcount)>17) {//must stand and compare values with player
+        cout << "Dealer: ";
+        printHand(dhand,dhandcount);
+        cout << endl;
+        break;
+
+      }
+      else if (getBestScore(dhand,dhandcount)<17) {
+        dhand[dhandcount] = cards[deckcount+1]; // dhandcount = 2 , deckcount +1 = next index/card
+        dhandcount++;
+        deckcount++;
+        if (getBestScore(dhand, dhandcount)>21) {
+          cout <<"Dealer: ";
+          printHand(dhand, dhandcount);
+          cout << endl;
+          cout << "Dealer " << "busts" << endl;
+          cout << "Win " << getBestScore(phand,phandcount) <<" " << getBestScore(dhand,dhandcount) << endl;
+          dealerBust = true;
+          break; // how to skip dealer's turn and end game here? -> execute = false before break
+        }
+      }
+    } // if (dealerBust == true) { break; }
+
+  //comparing scores
+if ( getBestScore(phand,phandcount) < getBestScore(dhand,dhandcount) && playerBust == false && dealerBust == false && getBestScore(phand,phandcount)!=21) {
+    cout << "Lose ";
+    cout << getBestScore(phand,phandcount);
+    cout << " ";
+    cout << getBestScore(dhand,dhandcount); 
+    cout << endl;
+  }
+  else if (getBestScore(phand,phandcount) > getBestScore(dhand,dhandcount) && playerBust == false && dealerBust == false && getBestScore(phand,phandcount)!=21) {
+    cout << "Win ";
+    cout << getBestScore(phand,phandcount);
+    cout << " ";
+    cout << getBestScore(dhand,dhandcount);
+    cout << endl;
+  } 
+  else if (getBestScore(phand,phandcount) == getBestScore(dhand,dhandcount) && playerBust == false && dealerBust == false && getBestScore(phand,phandcount)!=21) {
+    cout << "Tie ";
+    cout << getBestScore(phand,phandcount);
+    cout << " ";
+    cout << getBestScore(dhand,dhandcount);
+    cout <<endl;
+  } 
+
+  char response;
+  cout << endl;
+  cout << "Play again? [y/n]" << endl;
+  cin >> response;
+
+  if (response == 'y') {
+    execute = true;
+  }
+  else {
+    execute = false;
+  }
+  }
+
+  // 20132 not working. do i add if (=21) to the 'h' or 's' bracket
+  // how to make playerbust or dealerbust leave the function and skip compare values function?
+
+  return 0;
+}
+
